@@ -1,12 +1,18 @@
 const User = require('../models/user');
-const { UniqueConstraintError } = require('sequelize');
 
-exports.postAddUser = async(req,res) => {
+const isStringValid = (string) => {
+    if(!string || string.length ===0){
+        return true;
+    }else
+        return false;
+}
+
+exports.postAddUser = async (req,res) => {
     try{
-        const name = req.body.name;
-        const email = req.body.email;
-        const password = req.body.password;
-        console.log(name);
+        const {name, email, password} = req.body;
+       if(isStringValid(name) || isStringValid(email) || isStringValid(password)){
+            return res.status(400).json({err:"Bad parameter. something missing"})
+       }
 
         let newUser = await User.create({
             name,
@@ -15,8 +21,22 @@ exports.postAddUser = async(req,res) => {
         });
         
 
-        res.status(201).json({newUser:newUser});
+        res.status(201).json({message: 'Successfuly create new user'});
     }catch(err) {
-        res.status(403).json({error:err});
+        res.status(403).json({err});
+    }
+}
+
+exports.login = async (req , res) => {
+    try{
+        const {email, password} = req.body;
+        const user = await User.findOne({where:{email: email}});
+        if(user === null || user.password != password){
+            return res.status(400).json({err:"user not found"});
+        }
+        res.status(201).json({message: 'Successfuly logged in'});
+    }
+    catch(err){
+        res.status(403).json({err});
     }
 }

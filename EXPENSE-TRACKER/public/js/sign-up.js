@@ -1,28 +1,31 @@
 const signUpForm = document.getElementById('signupForm');
 
-function signup(e) {
+async function signup(e) {
     e.preventDefault();
-    const name = document.getElementById('username').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-
-
-    const userData = {
-        name: name,
-        email: email,
-        password: password
-    };
-
-    axios.post('http://localhost:3000/user/sign-up', userData)
-        .then(response => {
-            console.log('Signup successful!');
-        })
-        .catch(err => {
-            console.log(err);
-            document.body.innerHTML += `<p>Error: ${err.message}</p>`;
+    try{
+        const name = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+    
+    
+    
+        const userData = {
+            name: name,
+            email: email,
+            password: password
+        };
+    
+        const response = await axios.post('http://localhost:3000/user/sign-up', userData);
+            if(response.status === 201){
+                window.location.href = "../Login/login.html"
+            } else {
+                throw new Error('Failed to login')
+            }
+     
+    }catch(err){
+        document.body.innerHTML += `<div style ="color:red;">${err}<div>`;
             
-        });
+    }
 }
 
 signUpForm.addEventListener('submit' , signup);
