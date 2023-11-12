@@ -13,7 +13,8 @@ expenseForm.addEventListener('submit', async function(event) {
       expenseCategory
     }
     
-    const result = await axios.post("http://localhost:3000/expense/add-data" ,obj)
+    const token = localStorage.getItem('token');
+    const result = await axios.post("http://localhost:3000/expense/add-data" ,obj , {headers: {"Authorization" : token}})
     
       console.log(res);
       showItems(result.data.newData);
@@ -22,11 +23,6 @@ expenseForm.addEventListener('submit', async function(event) {
     console.log(err)
     document.body.innerHTML=document.body.innerHTML + "<h3>error occured</h3>"
   }
- 
-    
-    
-
-  
 
 });
 
@@ -42,7 +38,8 @@ function showItems(expense) {
   const deleteButton = document.createElement('button');
   deleteButton.textContent = 'Delete';
   deleteButton.addEventListener('click', function() {
-    axios.delete(`http://localhost:3000/expense/delete-data/${expense.id}`)
+    const token = localStorage.getItem('token');
+    axios.delete(`http://localhost:3000/expense/delete-data/${expense.id}` , {headers: {"Authorization" : token}} )
     .then(res=>{
       listItem.remove();
     }).catch(err=>console.log(err));
@@ -57,13 +54,16 @@ function showItems(expense) {
   document.getElementById('expenseCategory').value = '';
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
-    axios.get("http://localhost:3000/expense/get-data").then(res =>{
-       for(let i=0; i< res.data.allData.length ;i++){
-        showItems(res.data.allData[i]);
-       }
-    })
-    .catch(e=>console.log(e))
+document.addEventListener("DOMContentLoaded", async ()=>{
+  try{
+    const token = localStorage.getItem('token');
+    const result = await axios.get("http://localhost:3000/expense/get-data", {headers: {"Authorization" : token}});
+    for(let i=0; i< result.data.allData.length ;i++){
+      showItems(result.data.allData[i]);
+    }
+  }catch(err){
+    console.log(err);
+  }
 })
 
 

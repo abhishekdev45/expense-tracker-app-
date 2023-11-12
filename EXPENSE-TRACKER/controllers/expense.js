@@ -6,7 +6,12 @@ exports.postUserData = async (req,res)=>{
         const expenseDescription = req.body.expenseDescription;
         const expenseCategory = req.body.expenseCategory;
       
-        const data = await Expense.create({expenseAmount:expenseAmount,expenseDescription:expenseDescription,expenseCategory:expenseCategory});
+        const data = await Expense.create({
+            expenseAmount:expenseAmount,
+            expenseDescription:expenseDescription,
+            expenseCategory:expenseCategory,
+            userId:req.user.id
+        });
         res.status(201).json({success:true ,newData:data});
     }catch(err){
        res.status(500).json({success:false , message:err});
@@ -16,7 +21,7 @@ exports.postUserData = async (req,res)=>{
 
 exports.getUserData = async (req,res)=>{
     try{
-       const data = await Expense.findAll();
+       const data = await Expense.findAll({ where : {userId : req.user.id} });
        res.status(200).json({success:true ,allData:data})
     }catch(err){
         res.status(500).json({success:false ,message:err})
@@ -29,7 +34,7 @@ exports.postDeleteData = async (req,res)=>{
            return res.status(400).json({success:false ,message:"id not found"});
         }
         const userId = req.params.id;
-        await Expense.destroy({where:{id:userId}});
+        await Expense.destroy({where:{id:userId , userId: req.user.id}});
         res.sendStatus(200);
     }catch(err){
         res.status(500).json({success:false , message:err});

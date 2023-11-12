@@ -15,8 +15,9 @@ async function login(e) {
 
     const response = await axios.post('http://localhost:3000/user/login', loginDetails)
         
-        console.log(response.message);
-         
+        alert(response.data.message);
+        localStorage.setItem('token' , response.data.token)
+        // window.location.href = "../views/expense.html"
     }catch(err){
         console.log(Json.stringify(err))
         document.body.innerHTML += `<div style="color:red">${err.message}<div>`;
