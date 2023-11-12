@@ -1,0 +1,26 @@
+#expenseForm {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#expenseForm label {
+    margin-right: 10px;
+}
+
+#expenseForm input, #expenseForm select, #expenseForm button {
+    margin-right: 10px;
+}
+
+#expenseForm button {
+    margin-right: 0;
+}
+
+#expenseList li {
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#expenseList li button {
+    margin-left: 10px;
+}

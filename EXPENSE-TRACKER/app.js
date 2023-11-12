@@ -2,7 +2,8 @@ const express = require("express");
 const sequelize = require("./utils/database");
 const cors = require("cors");
 
-const addUserRoute = require("./routes/user");
+const userRoute = require("./routes/user");
+const expenseRoute = require("./routes/expense")
 const mainRoute = require("./routes/main");
 
 const app = express();
@@ -12,7 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
-app.use("/user",addUserRoute);
+app.use("/user",userRoute);
+app.use("/expense",expenseRoute);
 app.use("/", mainRoute);
 
 sequelize.sync().then((result)=>{

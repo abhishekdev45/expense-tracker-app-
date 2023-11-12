@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="/css/expense.css">
+</head>
+<body>
+  <h1>Expense Tracker</h1>
+  
+  <form id="expenseForm">
+    <label for="expenseAmount">Choose Expense Amount:</label>
+    <input type="number" id="expenseAmount" required><br><br>
+    
+    <label for="expenseDescription">Choose Description:</label>
+    <input type="text" id="expenseDescription" required><br><br>
+    
+    <label for="expenseCategory">Category:</label>
+    <select id="expenseCategory" required>
+      <option value="food">Food</option>
+      <option value="movie">Movie</option>
+      <option value="rent">Rent</option>
+      <option value="recharge">Recharge</option>
+      <option value="outing">Outing</option>
+      <option value="travel">Travel</option>
+      <option value="fuel">Fuel</option>
+    </select><br><br>
+    
+    <button type="submit" value="add expense">Add Expense</button>
+  </form>
+  
+  <ul id="expenseList"></ul>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+  <script src="/js/expense.js"></script>
+</body>
+</html>
