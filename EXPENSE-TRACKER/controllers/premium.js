@@ -4,20 +4,21 @@ const Expense = require('../models/expense')
 exports.getLeaderBoardData = async (req, res) => {
     try {
         const leaderboardData = await User.findAll({
-            attributes: ['name'],
-            include: [{
-                model: Expense,
-                attributes: [
-                    [sequelize.fn('SUM', sequelize.col('expenseAmount')), 'total_cost']
-                ],
-                group: ['UserId']
-            }],
-            raw: true
+            attributes: ['id' ,'name' ,[sequelize.fn('SUM', sequelize.col('expenseAmount')), 'total_cost']],
+            include: [
+                {
+                    model: Expense,
+                    attributes: [],
+               }   
+            ],
+            group: ['user.id'],
+            order:[['total_cost', 'DESC']]
+           
         });
 
-        res.json(leaderboardData);
+        res.status(200).json(leaderboardData);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json(err);
     }
 };
