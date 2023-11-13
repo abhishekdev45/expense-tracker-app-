@@ -1,25 +1,37 @@
 const Expense = require('../models/expense');
+const sequelize = require('../utils/database');
+const User = require('../models/user');
 
 exports.postUserData = async (req,res)=>{
+    
     try{
+        const t = await sequelize.transaction();
+
         const expenseAmount = req.body.expenseAmount;
         const expenseDescription = req.body.expenseDescription;
         const expenseCategory = req.body.expenseCategory;
+
+        if(expenseAmount == undefined || expenseAmount.length === 0){
+            return res.status(400).json({success:false , message:'parameter missing'})
+        }
       
         const data = await Expense.create({
             expenseAmount:expenseAmount,
             expenseDescription:expenseDescription,
             expenseCategory:expenseCategory,
             UserId:req.user.id
-        });
+        } , {transaction:t});
 
         await User.increment('totalExpense', {
             by: expenseAmount,
-            where: { id: req.user.id }
+            where: { id: req.user.id },
+            transaction:t
         });
         
+        await t.commit();
         res.status(201).json({success:true ,newData:data});
     }catch(err){
+       await t.rollback();
        res.status(500).json({success:false , message:err});
     }
   
@@ -34,20 +46,47 @@ exports.getUserData = async (req,res)=>{
     }
 }
 
+
 exports.postDeleteData = async (req,res)=>{
-    try{
-        if(!req.params.id == "undefined"){
-           return res.status(400).json({success:false ,message:"id not found"});
+    try {
+        const t = await sequelize.transaction();
+
+        if (!req.params.id || req.params.id === "undefined") {
+            await t.rollback(); 
+            return res.status(400).json({ success: false, message: "id not found" });
         }
-        const userId = req.params.id;
-        await Expense.destroy({where:{id:userId , userId: req.user.id}});
+
+        const expenseId = req.params.id;
+
+        const expense = await Expense.findOne({ where: { id: expenseId, userId: req.user.id }, transaction: t });
+
+        if (!expense) {
+            await t.rollback();
+            return res.status(404).json({ success: false, message: "Expense not found" });
+        }
+
+        const expenseAmount = expense.expenseAmount;
+
+        await User.decrement('totalExpense', {
+            by: expenseAmount,
+            where: { id: req.user.id },
+            transaction: t
+        });
+
+        await Expense.destroy({ where: { id: expenseId, userId: req.user.id }, transaction: t });
+
+        await t.commit(); 
+
         res.sendStatus(200);
-    }catch(err){
-        res.status(500).json({success:false , message:err});
+    } catch (err) {
+        await t.rollback();
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
     }
+};
 
 
-}
+
 
 // exports.postUpdateData = async (req, res) => {
 //     try {
