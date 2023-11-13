@@ -17,13 +17,14 @@ async function signup(e) {
     
         const response = await axios.post('http://localhost:3000/user/sign-up', userData);
             if(response.status === 201){
-                window.location.href = "../Login/login.html"
+                window.location.href = "../../views/login.html"
             } else {
                 throw new Error('Failed to login')
             }
+
      
     }catch(err){
-        document.body.innerHTML += `<div style ="color:red;">${err}<div>`;
+        document.body.innerHTML += `<div style ="color:red;">${err.message}<div>`;
             
     }
 }

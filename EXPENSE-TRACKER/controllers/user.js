@@ -15,7 +15,7 @@ exports.postAddUser = async (req,res) => {
        if(isStringValid(name) || isStringValid(email) || isStringValid(password)){
             return res.status(400).json({err:"Bad parameter. something missing"})
        }
-       bcrypt.hash(password , saltrounds , async (err , hash) => {
+       bcrypt.hash(password , 10 , async (err , hash) => {
             await User.create({
                 name,
                 email,
@@ -35,7 +35,6 @@ function generateAccessToken(id , name){
 exports.login = async (req , res) => {
     try{
         const {email, password} = req.body;
-
         if(isStringValid(email) || isStringValid(password)){
             return res.status(400).json({success:false ,message:'Email id or password is missing'})
         }

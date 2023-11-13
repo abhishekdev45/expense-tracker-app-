@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-const User = reuire('../models/user');
+const User = require('../models/user');
 
 const authenticate = async (req,res,next) => {
     try{
         const token = req.header('Authorization');
         const userObj = jwt.verify(token,'secret_key');
 
-        const user = User.findByPk(userObj.userId);
+        const user = await User.findByPk(userObj.userId);
         req.user = user;
         next();
     }

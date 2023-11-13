@@ -10,8 +10,9 @@ exports.postUserData = async (req,res)=>{
             expenseAmount:expenseAmount,
             expenseDescription:expenseDescription,
             expenseCategory:expenseCategory,
-            userId:req.user.id
+            UserId:req.user.id
         });
+        
         res.status(201).json({success:true ,newData:data});
     }catch(err){
        res.status(500).json({success:false , message:err});
