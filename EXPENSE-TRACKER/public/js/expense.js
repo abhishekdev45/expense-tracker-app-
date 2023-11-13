@@ -73,7 +73,7 @@ function displayLeaderboard(leaderBoardData) {
     entryDiv.appendChild(nameElement);
 
     const expenseElement = document.createElement('p');
-    expenseElement.textContent = `Total Expense: ${item.total_cost}`;
+    expenseElement.textContent = `Total Expense: ${item.totalExpense}`;
     entryDiv.appendChild(expenseElement);
 
     leaderboardContainer.appendChild(entryDiv);

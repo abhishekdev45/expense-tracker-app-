@@ -12,6 +12,11 @@ exports.postUserData = async (req,res)=>{
             expenseCategory:expenseCategory,
             UserId:req.user.id
         });
+
+        await User.increment('totalExpense', {
+            by: expenseAmount,
+            where: { id: req.user.id }
+        });
         
         res.status(201).json({success:true ,newData:data});
     }catch(err){
