@@ -1,5 +1,23 @@
 const loginForm = document.getElementById('loginForm');
 
+const forgotPasswordBtn = document.getElementById('forgotPasswordLink');
+
+forgotPasswordBtn.addEventListener('click', function() {
+    document.getElementById('forgotPasswordForm').style.display = 'block';
+});
+
+const  forgotPasswordForm = document.getElementById('forgotPasswordForm');
+
+forgotPasswordForm.addEventListener('submit' , async () => {
+    try{
+        const email = document.getElementById('forgotEmail').value;
+        const result = await axios.post('http://localhost:3000/password/forgotpassword' , {email})
+        document.body.innerHTML += `<p>${result.message}</p>`;
+    }
+    catch(err){
+        document.body.innerHTML += `<div style ="color:red;">${err.message}</div>`;
+    }
+})
 
 async function login(e) {
     e.preventDefault();
