@@ -10,10 +10,12 @@ const  forgotPasswordForm = document.getElementById('forgotPasswordForm');
 
 forgotPasswordForm.addEventListener('submit' , async () => {
     try{
-        await axios.post('http://localhost:3000/password/forgotpassword')
+        const email = document.getElementById('forgotEmail').value;
+        const result = await axios.post('http://localhost:3000/user/forgotpassword' , {email})
+        document.body.innerHTML += `<p>${result.message}</p>`;
     }
     catch(err){
-        document.body.innerHTML += `<div style ="color:red;">${err.message}<div>`;
+        document.body.innerHTML += `<div style ="color:red;">${err.message}</div>`;
     }
 })
 
