@@ -1,5 +1,22 @@
 const signUpForm = document.getElementById('signupForm');
 
+const forgotPasswordBtn = document.getElementById('forgotPasswordLink');
+
+forgotPasswordBtn.addEventListener('click', function() {
+    document.getElementById('forgotPasswordForm').style.display = 'block';
+});
+
+const  forgotPasswordForm = document.getElementById('forgotPasswordForm');
+
+forgotPasswordForm.addEventListener('submit' , async () => {
+    try{
+        await axios.post('http://localhost:3000/password/forgotpassword')
+    }
+    catch(err){
+        document.body.innerHTML += `<div style ="color:red;">${err.message}<div>`;
+    }
+})
+
 async function signup(e) {
     e.preventDefault();
     try{
