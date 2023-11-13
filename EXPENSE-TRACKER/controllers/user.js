@@ -46,7 +46,7 @@ exports.login = async (req , res) => {
                     throw new Error('Something went wrong');
                 }
                 if(result){
-                    res.status(200).json({success: true , message: "user logged in successfully" , token : generateAccessToken(user[0].id , user[0].name)})
+                    res.status(200).json({isPremiumUser ,success: true , message: "user logged in successfully" , token : generateAccessToken(user[0].id , user[0].name)})
                 }else{
                     return res.status(400).json({success:false,message:'Password is incorrect'})
                 }

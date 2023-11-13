@@ -2,6 +2,8 @@ const expenseForm = document.getElementById('expenseForm');
 const expenseList = document.getElementById('expenseList');
 const rzpBtn = document.getElementById('rzpBtn');
 
+premiumUser();
+
 expenseForm.addEventListener('submit', async function(event) {
   event.preventDefault();
   try{
@@ -25,6 +27,60 @@ expenseForm.addEventListener('submit', async function(event) {
   }
 
 });
+
+function premiumUser(){
+  const isPremiumUser = localStorage.getItem('isPremiumUser');
+  if(isPremiumUser){
+    rzpBtn.style.display = 'none';
+    const premiumUserText = document.createElement('p');
+    const showLeaderboard = document.createElement('button');
+
+    showLeaderboard.textContent = "Show Leaderboard"
+    premiumUserText.textContent = 'You are a Premium User Now';
+
+    showLeaderboard.addEventListener('click' , async () => {
+
+      const result = await axios.get('http://localhost:3000/premium/showLeaderboard')
+      displayLeaderboard(result.data.leaderBoardData);
+    })
+
+    premiumUserText.appendChild(showLeaderboard);
+    document.body.appendChild(premiumUserText);
+
+  }
+}
+
+function displayLeaderboard(leaderBoardData) {
+  const leaderboardContainer = document.getElementById('leaderboardContainer');
+  
+  if (!leaderboardContainer) {
+    console.error('Leaderboard container not found');
+    return;
+  }
+
+  leaderboardContainer.innerHTML = '';
+
+  const leaderboardTitle = document.createElement('h2');
+  leaderboardTitle.textContent = 'Leaderboard';
+  leaderboardContainer.appendChild(leaderboardTitle);
+
+  leaderBoardData.forEach((item) => {
+
+    const entryDiv = document.createElement('div');
+
+    const nameElement = document.createElement('p');
+    nameElement.textContent = `Name: ${item.name}`;
+    entryDiv.appendChild(nameElement);
+
+    const expenseElement = document.createElement('p');
+    expenseElement.textContent = `Total Expense: ${item.total_cost}`;
+    entryDiv.appendChild(expenseElement);
+
+    leaderboardContainer.appendChild(entryDiv);
+  });
+}
+
+
 
 function showItems(expense) {
   document.getElementById("expenseAmount").value = "";
@@ -62,13 +118,21 @@ rzpBtn.addEventListener('click' , async () => {
     "key": response.data.key_id,
     "order_id": response.data.order.id,
     "handler": async (response) => {
-      await axios.post('http://localhost:3000/purchase/updatetransactionstatus' , {
-        order_id: options.order_id,
-        payment_id: response.razorpay_payment_id,
-      }, {headers: {"Authorization" : token}})
+      try{
+        await axios.post('http://localhost:3000/purchase/updatetransactionstatus' , {
+          order_id: options.order_id,
+          payment_id: response.razorpay_payment_id,
+        }, {headers: {"Authorization" : token}})
 
-      alert('You are a Premium User Now')
-    },
+        alert('You are a Premium User Now')
+        localStorage.setItem('isPremiumUser' , true);
+        premiumUser();
+
+      }catch(err){
+        alert('Transaction failed');
+      }
+      
+    }
    };
 
    const rzp1 = new Razorpay(options);

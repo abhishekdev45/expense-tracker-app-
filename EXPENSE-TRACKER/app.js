@@ -3,7 +3,8 @@ const sequelize = require("./utils/database");
 const cors = require("cors");
 
 const userRoute = require("./routes/user");
-const expenseRoute = require("./routes/expense")
+const expenseRoute = require("./routes/expense");
+const premiumRoute = require("./routes/premium")
 const mainRoute = require("./routes/main");
 
 const Expense = require("./models/expense");
@@ -18,6 +19,7 @@ app.use(express.static('public'));
 
 app.use("/user",userRoute);
 app.use("/expense",expenseRoute);
+app.use("/premium",premiumRoute);
 app.use("/", mainRoute);
 
 User.hasMany(Expense);
