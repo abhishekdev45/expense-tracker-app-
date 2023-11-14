@@ -32,7 +32,17 @@
     <button type="submit" value="add expense">Add Expense</button>
   </form>
 
+  <label for="expensesPerPage">Expenses per page:</label>
+  <select id="expensesPerPage" onchange="changeExpensesPerPage()">
+    <option value="2">2</option>
+    <option value="5">5</option>
+    <option value="10">10</option>
+    <option value="15">15</option>
+    <option value="20">20</option>
+  </select>
+
   <ul id="expenseList"></ul>
+  <div id="pagination"></div>
 
   <button id="rzpBtn">Buy Premium</button>
 
@@ -40,6 +50,9 @@
   <div id="leaderboardContainer"></div>
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  
+ 
+
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
   <script src="/js/expense.js"></script>

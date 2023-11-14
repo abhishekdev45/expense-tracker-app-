@@ -188,9 +188,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 
     const page = 1;
 
-    const res = await axios.get(`http://localhost:3000/expense/get-data?page=${page}` , {headers: {"Authorization" : token}});
-    listExpenses(res.data.items)
-    showPagination(res.data.allData)
+    getProducts(page);
 
   }catch(err){
     console.log(err);
@@ -212,33 +210,43 @@ function showPagination({
   previousPage,
   lastPage,
 }){
-  showPagination.innerHTML ='';
+  pagination.innerHTML ='';
   if(hasPreviousPage){
     const btn2 = document.createElement('button')
     btn2.innerHTML = previousPage
     btn2.addEventListener('click' , ()=> getProducts(previousPage))
-    showPagination.appendChild(btn2);
+    pagination.appendChild(btn2);
   }
   const btn1 = document.createElement('button')
   btn2.innerHTML =`<h3> ${currentPage}</h3>`
   btn2.addEventListener('click' , ()=> getProducts(currentPage))
-  showPagination.appendChild(btn1);
+  pagination.appendChild(btn1);
   if(hasNextPage){
     const btn3 = document.createElement('button')
     btn3.innerHTML = nextPage
     btn3.addEventListener('click' , ()=> getProducts(nextPage))
     pagination.appendChild(btn3)
   };
+
+  const expensesPerPageDropdown = document.getElementById('expensesPerPage');
+  expensesPerPageDropdown.value = localStorage.getItem('expensesPerPage') || 10;
 }
 
 async function getProducts(page){
   try{
-    const res = await axios.get(`http://localhost:3000/expense/get-data?page=${page}` , {headers: {"Authorization" : token}});
-    listExpenses(res.data.items)
-    showPagination(res.data.allData)
+    const expensesPerPage = localStorage.getItem('expensesPerPage') || 10;
+    const res = await axios.get(`http://localhost:3000/expense/get-data?page=${page}&itemsPerPage=${expensesPerPage}` , {headers: {"Authorization" : token}});
+    listExpenses(res.data.allData)
+    showPagination(res.data)
   }catch(err){
     console.log(err);
   }
  
+}
+
+function changeExpensesPerPage() {
+  const selectedExpensesPerPage = document.getElementById('expensesPerPage').value;
+  localStorage.setItem('expensesPerPage', selectedExpensesPerPage );
+  getProducts(1); 
 }
 

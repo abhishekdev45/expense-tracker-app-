@@ -40,10 +40,24 @@ exports.postUserData = async (req,res)=>{
   
 }
 
+
+
 exports.getUserData = async (req,res)=>{
     try{
-       const data = await Expense.findAll({ where : {userId : req.user.id} });
-       res.status(200).json({success:true ,allData:data})
+       const page = +req.query.page || 1;
+       const ITEMS_PER_PAGE = req.query.itemsPerPage;
+       const totalItems = await Expense.count();
+       const data = await Expense.findAll({ where : {userId : req.user.id}, offset:(page-1)*ITEMS_PER_PAGE , limit:ITEMS_PER_PAGE });
+       res.status(200).json({
+        success:true ,
+        allData:data ,
+        currentPage: page,
+        hasNextPage: ITEMS_PER_PAGE*page < totalItems,
+        nextPage: page+1,
+        hasPreviousPage: page>1,
+        previousPage:page-1,
+        lastPage: Math.ceil(totalItems/ITEMS_PER_PAGE)
+    })
     }catch(err){
         res.status(500).json({success:false ,message:err})
     }
