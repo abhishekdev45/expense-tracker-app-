@@ -1,6 +1,28 @@
 const expenseForm = document.getElementById('expenseForm');
 const expenseList = document.getElementById('expenseList');
 const rzpBtn = document.getElementById('rzpBtn');
+const token = localStorage.getItem('token');
+
+async function download(){
+  
+  try{
+      const response = await axios.get('http://localhost:3000/user/download',  { headers: {"Authorization" : token} })
+  
+      if(response.status === 200){
+        
+          var a = document.createElement("a");
+          a.href = response.data.fileUrl;
+          a.download = 'myexpense.csv';
+          a.click();
+      } else {
+          throw new Error(response.data.message)
+      }
+
+  }
+  catch(err) {
+      showError(err)
+  }
+}
 
 expenseForm.addEventListener('submit', async function(event) {
   event.preventDefault();
@@ -17,7 +39,7 @@ expenseForm.addEventListener('submit', async function(event) {
       expenseDate
     }
     
-    const token = localStorage.getItem('token');
+
     const result = await axios.post("http://localhost:3000/expense/add-data" , obj , {headers: {"Authorization" : token}})
 
       showItems(result.data.newData);
@@ -91,7 +113,7 @@ function showItems(expense) {
   const deleteButton = document.createElement('button');
   deleteButton.textContent = 'Delete';
   deleteButton.addEventListener('click', function() {
-    const token = localStorage.getItem('token');
+    
     axios.delete(`http://localhost:3000/expense/delete-data/${expense.id}` , {headers: {"Authorization" : token}} )
     .then(res=>{
       listItem.remove();
@@ -140,6 +162,10 @@ rzpBtn.addEventListener('click' , async (e) => {
    }); 
 })
 
+function showError(err){
+  document.body.innerHTML += `<div style="color:red;"> ${err}</div>`
+}
+
 
 function parseJwt (token) {
   var base64Url = token.split('.')[1];
@@ -153,7 +179,7 @@ function parseJwt (token) {
 
 document.addEventListener("DOMContentLoaded", async ()=>{
   try{
-    const token = localStorage.getItem('token');
+
     const decodesToken = parseJwt(token) ;
     const isPremiumUser = decodesToken.isPremiumUser;
 

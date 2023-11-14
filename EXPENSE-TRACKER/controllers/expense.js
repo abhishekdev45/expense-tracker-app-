@@ -2,6 +2,7 @@ const Expense = require('../models/expense');
 const sequelize = require('../utils/database');
 const User = require('../models/user');
 
+ 
 exports.postUserData = async (req,res)=>{
     
     try{

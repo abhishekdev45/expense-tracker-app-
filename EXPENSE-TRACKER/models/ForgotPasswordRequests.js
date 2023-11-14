@@ -15,6 +15,7 @@ const ForgotPasswordRequest = sequelize.define('ForgotPasswordRequest', {
     defaultValue: true,
     allowNull: false,
   },
+  expiresby: Sequelize.DATE
 });
 
 module.exports = ForgotPasswordRequest;

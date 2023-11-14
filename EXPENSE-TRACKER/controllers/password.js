@@ -65,7 +65,7 @@ exports.getResetPassword = async (req,res) => {
               isActive: true,
             },
           });
-        if (request.length > 0) {
+        if (request) {
             const formHtml = `
       <!DOCTYPE html>
       <html lang="en">
@@ -75,8 +75,7 @@ exports.getResetPassword = async (req,res) => {
           <title>Reset Password</title>
       </head>
       <body>
-          <form action="/password/updatepassword" method="post">
-              <input type="hidden" name="requestId" value="${requestId}">
+          <form action="/password/updatePassword/${requestId}" method="get">
               <label for="newPassword">New Password:</label>
               <input type="password" id="newPassword" name="newPassword" required>
               <button type="submit">Update Password</button>
@@ -100,23 +99,23 @@ exports.getResetPassword = async (req,res) => {
 
 exports.postUpdatePassword = async (req,res) => {
     try{
-        const requestId = req.body.requestId;
-        const newPassword = req.body.newPassword;
+        const requestId = req.params.resetpasswordid;
+        const newPassword = req.query.newPassword;
 
         const forgotPasswordRequest = await ForgotPasswordRequest.findByPk(requestId);
 
         if (forgotPasswordRequest && forgotPasswordRequest.isActive) {
             const userId = forgotPasswordRequest.userId;
-            const hashedPassword = await bcrypt.hash(newPassword, 10); // Implement your password hashing logic
+            const hashedPassword = await bcrypt.hash(newPassword, 10); 
             await User.update({ password: hashedPassword }, { where: { id: userId } });
 
             await forgotPasswordRequest.update({ isActive: false });
 
-            res.send('Password updated successfully');
+            res.status(201).json({message: 'Successfuly update the new password'})
         } else {
-            throw new Error("error");
+            return res.status(404).json({ error: 'No user Exists', success: false})
         }
     }catch(err){
-        res.status(404).json(err);
+        return res.status(403).json({ error, success: false } )
     }
 }

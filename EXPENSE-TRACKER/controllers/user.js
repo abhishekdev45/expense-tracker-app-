@@ -2,7 +2,9 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const Sib = require('sib-api-v3-sdk');
+const S3Services = require('../services/S3services')
+const UserServices = require('../services/userservices')
+
 require('dotenv').config();
 
 
@@ -13,9 +15,11 @@ const isStringValid = (string) => {
         return false;
 }
 
-exports.postAddUser = async (req,res) => {
+const postAddUser = async (req,res) => {
     try{
+
         const {name, email, password} = req.body;
+        console.log(name, email, password)
        if(isStringValid(name) || isStringValid(email) || isStringValid(password)){
             return res.status(400).json({err:"Bad parameter. something missing"})
        }
@@ -32,17 +36,22 @@ exports.postAddUser = async (req,res) => {
     }
 } 
 
-exports.generateAccessToken = (id , name , isPremiumUser ) => {
+const generateAccessToken = (id , name , isPremiumUser ) => {
     return jwt.sign({ userId: id , name:name, isPremiumUser } , 'secret_key')
 }
 
-exports.login = async (req , res) => {
+const login = async (req , res) => {
+    
     try{
         const {email, password} = req.body;
+        
         if(isStringValid(email) || isStringValid(password)){
             return res.status(400).json({success:false ,message:'Email id or password is missing'})
         }
+
+       
         const user = await User.findAll({where:{email}});
+        
         if(user.length > 0){
             bcrypt.compare(password , user[0].password , (err,result) =>{
                 if(err){
@@ -60,7 +69,35 @@ exports.login = async (req , res) => {
         
     }
     catch(err){
+        
         res.status(500).json({message:err, success:false});
     }
 }
 
+
+
+
+const getDownload = async (req , res) => {
+    try{ 
+        const expenses = await UserServices.getExpenses(req);
+        const stringifiedExpenses = JSON.stringify(expenses);
+
+        const userId = req.user.id;
+
+        const filenme = `Expense${userId}/${new Date()}.txt`;
+        const fileUrl = await S3Services.uploadToS3(stringifiedExpenses,filenme);
+        res.status(200).json({fileUrl , success:true})
+
+    }catch(err){
+        res.status(500).json({success:false , err ,fileUrl :''});
+    }
+
+    
+}
+
+module.exports = {
+    getDownload,
+    postAddUser,
+    login,
+    generateAccessToken
+}
