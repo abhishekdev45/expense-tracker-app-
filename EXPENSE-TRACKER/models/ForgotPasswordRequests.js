@@ -9,10 +9,7 @@ const ForgotPasswordRequest = sequelize.define('ForgotPasswordRequest', {
     primaryKey: true,
     allowNull: false,
   },
-  userId: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
+  
   isActive: {
     type: Sequelize.BOOLEAN,
     defaultValue: true,

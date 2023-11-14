@@ -10,6 +10,7 @@ exports.postUserData = async (req,res)=>{
         const expenseAmount = req.body.expenseAmount;
         const expenseDescription = req.body.expenseDescription;
         const expenseCategory = req.body.expenseCategory;
+        const expenseDate = req.body.expenseDate;
 
         if(expenseAmount == undefined || expenseAmount.length === 0){
             return res.status(400).json({success:false , message:'parameter missing'})
@@ -19,6 +20,7 @@ exports.postUserData = async (req,res)=>{
             expenseAmount:expenseAmount,
             expenseDescription:expenseDescription,
             expenseCategory:expenseCategory,
+            expenseDate:expenseDate,
             UserId:req.user.id
         } , {transaction:t});
 

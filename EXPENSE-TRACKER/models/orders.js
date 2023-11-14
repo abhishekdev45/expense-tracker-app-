@@ -9,10 +9,6 @@ const Order = sequelize.define('order', {
         allowNull:false,
         primaryKey: true,
     },
-    name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-    },
     paymentid: Sequelize.STRING,
     orderid: Sequelize.STRING,
     status: Sequelize.STRING

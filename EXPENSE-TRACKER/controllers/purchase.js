@@ -1,11 +1,12 @@
 const Razorpay = require('razorpay');
 const Order = require('../models/orders')
+const userControllers = require("./user");
 
-const purchasePremium = async (req,res) => {
+exports.purchasePremium = async (req,res) => {
     try{
         var rzp = new Razorpay({
-            key_id: process.env.RAZORPAY_KEY_ID,
-            key_secret: process.env.RAZORPAY_KEY_SECRET
+            key_id: 'rzp_test_Wjuyb0lZu954ow',
+            key_secret: 'f4nI149IEyAA0Nb4tHaD2n49'
         })
         const amount = 2500;
 
@@ -16,11 +17,12 @@ const purchasePremium = async (req,res) => {
             req.user.createOrder({orderid:order.id, status: 'PENDING'}).then(() => {
                 return res.status(201).json({order, key_id : rzp.key_id});
             }).catch(err => {
-                throw new Error(err);
+                throw new Error(JSON.stringify(err));
             })
         })
     }catch(err){
-        res.status(403).json({message:'Something went wrong' , error: err})
+        console.log(err);
+        res.status(500).json({ message: 'Something went wrong', error: err });
     }
 }
 
@@ -43,18 +45,21 @@ const purchasePremium = async (req,res) => {
 //     }
 // }
 
-const updateTransactionStatus = async (req, res) => {
+exports.updateTransactionStatus = async (req, res) => {
+    let order_id;
     try {
-        const { payment_id, order_id } = req.body;
+        const { payment_id, order_id :  orderId } = req.body;
+        order_id = orderId;
+        const userId = req.user.id
 
         const order = await Order.findOne({ where: { orderid: order_id } });
+        const promise1 = order.update({ paymentid: payment_id, status: 'SUCCESSFUL' } )
+        const promise2 = req.user.update({ isPremiumUser: true })
 
-        const [updatedOrder, updatedUser] = await Promise.all([
-            order.update({ paymentid: payment_id, status: 'SUCCESSFUL' }),
-            req.user.update({ isPremiumUser: true })
-        ]);
+        await Promise.all([promise1, promise2])
+    
 
-        return res.status(202).json({ success: true, message: "Transaction status successful" });
+        return res.status(202).json({ success: true, message: "Transaction status successful", token: userControllers.generateAccessToken(userId , undefined, true)});
     } catch (err) {
         console.error(err);
 
@@ -72,7 +77,3 @@ const updateTransactionStatus = async (req, res) => {
     }
 };
 
-module.exports = {
-    purchasePremium,
-    updateTransactionStatus
-}

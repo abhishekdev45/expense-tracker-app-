@@ -1,9 +1,5 @@
 const signUpForm = document.getElementById('signupForm');
 
-
-
-
-
 async function signup(e) {
     e.preventDefault();
     try{

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="/css/report.css">
+</head>
+<body>
+  <h1>Day To Day Expense</h1>
+  
+  <div>
+    <p id="currentDateTime"></p>
+    <h3 id="currentYear"></h3>
+  </div>
+
+  <h2>Monthly Expense</h2>
+  <table id="monthlyExpenseTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Expense</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3">Total Expense</td>
+        <td id="totalMonthlyExpense"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <h2>Yearly Report</h2>
+  <table id="yearlyReportTable">
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th>Total Expense</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+    </tbody>
+  </table>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/js/report.js"></script>
+</body>
+</html>

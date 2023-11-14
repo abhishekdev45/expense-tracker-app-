@@ -2,18 +2,19 @@ const expenseForm = document.getElementById('expenseForm');
 const expenseList = document.getElementById('expenseList');
 const rzpBtn = document.getElementById('rzpBtn');
 
-premiumUser();
-
 expenseForm.addEventListener('submit', async function(event) {
   event.preventDefault();
   try{
     const expenseAmount = document.getElementById('expenseAmount').value;
     const expenseDescription = document.getElementById('expenseDescription').value;
     const expenseCategory = document.getElementById('expenseCategory').value;
+    const expenseDate = document.getElementById('expenseDate').value;
+
     const obj = {
       expenseAmount,
       expenseDescription,
-      expenseCategory
+      expenseCategory,
+      expenseDate
     }
     
     const token = localStorage.getItem('token');
@@ -29,8 +30,7 @@ expenseForm.addEventListener('submit', async function(event) {
 });
 
 function premiumUser(){
-  const isPremiumUser = localStorage.getItem('isPremiumUser');
-  if(isPremiumUser){
+
     rzpBtn.style.display = 'none';
     const premiumUserText = document.createElement('p');
     const showLeaderboard = document.createElement('button');
@@ -41,20 +41,20 @@ function premiumUser(){
     showLeaderboard.addEventListener('click' , async () => {
 
       const result = await axios.get('http://localhost:3000/premium/showLeaderboard')
+     
       displayLeaderboard(result.data.leaderBoardData);
     })
 
     premiumUserText.appendChild(showLeaderboard);
     document.body.appendChild(premiumUserText);
 
-  }
 }
 
 function displayLeaderboard(leaderBoardData) {
   const leaderboardContainer = document.getElementById('leaderboardContainer');
   
   if (!leaderboardContainer) {
-    console.error('Leaderboard container not found');
+    console.log('Leaderboard container not found');
     return;
   }
 
@@ -63,18 +63,14 @@ function displayLeaderboard(leaderBoardData) {
   const leaderboardTitle = document.createElement('h2');
   leaderboardTitle.textContent = 'Leaderboard';
   leaderboardContainer.appendChild(leaderboardTitle);
-
+ 
   leaderBoardData.forEach((item) => {
 
     const entryDiv = document.createElement('div');
 
     const nameElement = document.createElement('p');
-    nameElement.textContent = `Name: ${item.name}`;
+    nameElement.textContent = `Name: ${item.name}    Total Expense: ${item.totalExpense}`;
     entryDiv.appendChild(nameElement);
-
-    const expenseElement = document.createElement('p');
-    expenseElement.textContent = `Total Expense: ${item.totalExpense}`;
-    entryDiv.appendChild(expenseElement);
 
     leaderboardContainer.appendChild(entryDiv);
   });
@@ -86,8 +82,9 @@ function showItems(expense) {
   document.getElementById("expenseAmount").value = "";
   document.getElementById("expenseDescription").value = "";
   document.getElementById("expenseCategory").value = "";
+  document.getElementById("expenseDate").value = "";
 
-  const expenseInfo = `${expense.expenseAmount}-${expense.expenseDescription}-${expense.expenseCategory}`;
+  const expenseInfo = `${expense.expenseDate}-${expense.expenseAmount}-${expense.expenseDescription}-${expense.expenseCategory}`;
   const listItem = document.createElement('li');
   listItem.textContent = expenseInfo;
   
@@ -110,27 +107,26 @@ function showItems(expense) {
   document.getElementById('expenseCategory').value = '';
 }
 
-rzpBtn.addEventListener('click' , async () => {
+rzpBtn.addEventListener('click' , async (e) => {
+  
    const token = localStorage.getItem('token');
    const response = await axios.get('http://localhost:3000/purchase/premiummembership', {headers: {"Authorization" : token}})
-    
+   console.log(response)
    var options = {
     "key": response.data.key_id,
     "order_id": response.data.order.id,
     "handler": async (response) => {
-      try{
-        await axios.post('http://localhost:3000/purchase/updatetransactionstatus' , {
+      
+      const res = await axios.post('http://localhost:3000/purchase/updatetransactionstatus' , {
           order_id: options.order_id,
           payment_id: response.razorpay_payment_id,
         }, {headers: {"Authorization" : token}})
 
         alert('You are a Premium User Now')
-        localStorage.setItem('isPremiumUser' , true);
+        localStorage.setItem('token' , res.data.token)
         premiumUser();
 
-      }catch(err){
-        alert('Transaction failed');
-      }
+      
       
     }
    };
@@ -145,12 +141,27 @@ rzpBtn.addEventListener('click' , async () => {
 })
 
 
+function parseJwt (token) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
 
+  return JSON.parse(jsonPayload);
+}
 
 document.addEventListener("DOMContentLoaded", async ()=>{
   try{
     const token = localStorage.getItem('token');
+    const decodesToken = parseJwt(token) ;
+    const isPremiumUser = decodesToken.isPremiumUser;
+
+    if(isPremiumUser){
+      premiumUser();
+    }
     const result = await axios.get("http://localhost:3000/expense/get-data", {headers: {"Authorization" : token}});
+
     for(let i=0; i< result.data.allData.length ;i++){
       showItems(result.data.allData[i]);
     }

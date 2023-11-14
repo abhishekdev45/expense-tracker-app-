@@ -38,7 +38,7 @@ exports.forgotPassword = async (req,res) => {
             sender,
             to: receivers,
             subject: "password reset",
-            textContent : `click here to reset password http://localhost:3000/password/resetpassword/96c81373-6d2b-452f-a65d-6ce77e457e39 `,
+            // textContent : `click here to reset password http://localhost:3000/password/resetpassword/96c81373-6d2b-452f-a65d-6ce77e457e39 `,
             htmlContent : `
                 <p1>click to reset your password</p>
                 <a href = 'http://localhost:3000/password/resetpassword/${params.uuid}' >click to reset</a>

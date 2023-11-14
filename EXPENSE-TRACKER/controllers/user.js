@@ -32,7 +32,35 @@ exports.postAddUser = async (req,res) => {
     }
 } 
 
-function generateAccessToken(id , name){
-    return jwt.sign({ userId: id , name:name } , 'secret_key')
+exports.generateAccessToken = (id , name , isPremiumUser ) => {
+    return jwt.sign({ userId: id , name:name, isPremiumUser } , 'secret_key')
+}
+
+exports.login = async (req , res) => {
+    try{
+        const {email, password} = req.body;
+        if(isStringValid(email) || isStringValid(password)){
+            return res.status(400).json({success:false ,message:'Email id or password is missing'})
+        }
+        const user = await User.findAll({where:{email}});
+        if(user.length > 0){
+            bcrypt.compare(password , user[0].password , (err,result) =>{
+                if(err){
+                    throw new Error('Something went wrong');
+                }
+                if(result){
+                    res.status(200).json({success: true , message: "user logged in successfully" , token : generateAccessToken(user[0].id , user[0].name , user[0].isPremiumUser)})
+                }else{
+                    return res.status(400).json({success:false,message:'Password is incorrect'})
+                }
+            })
+        }else{
+            return res.status(404).json({success:false , message:'User Does not exist'})
+        }
+        
+    }
+    catch(err){
+        res.status(500).json({message:err, success:false});
+    }
 }
 
